@@ -432,7 +432,11 @@ async function runQuery(
         'TeamCreate', 'TeamDelete', 'SendMessage',
         'TodoWrite', 'ToolSearch', 'Skill',
         'NotebookEdit',
-        'mcp__nanoclaw__*'
+        'mcp__nanoclaw__*',
+        'mcp__gmail__*',
+        'mcp__google_calendar__*',
+        'mcp__linear__*',
+        ...(containerInput.isMain ? ['mcp__imessage__*'] : []),
       ],
       env: sdkEnv,
       permissionMode: 'bypassPermissions',
@@ -448,6 +452,29 @@ async function runQuery(
             NANOCLAW_IS_MAIN: containerInput.isMain ? '1' : '0',
           },
         },
+        gmail: {
+          command: 'npx',
+          args: ['-y', '@gongrzhe/server-gmail-autoauth-mcp'],
+        },
+        'google-calendar': {
+          command: 'npx',
+          args: ['-y', '@cocal/google-calendar-mcp'],
+          env: {
+            GOOGLE_OAUTH_CREDENTIALS: '/home/node/.gmail-mcp/gcp-oauth.keys.json',
+            ENABLED_TOOLS: 'list-calendars,list-events,get-event,search-events,get-freebusy,get-current-time',
+          },
+        },
+        linear: {
+          command: 'npx',
+          args: ['-y', 'mcp-remote', 'https://mcp.linear.app/mcp'],
+        },
+        // iMessage: main-only, connects to host bridge via HTTP
+        ...(containerInput.isMain ? {
+          imessage: {
+            command: 'npx',
+            args: ['-y', 'mcp-remote', 'http://host.docker.internal:8090/mcp', '--allow-http'],
+          },
+        } : {}),
       },
       hooks: {
         PreCompact: [{ hooks: [createPreCompactHook(containerInput.assistantName)] }],

@@ -139,6 +139,47 @@ function buildVolumeMounts(
     readonly: false,
   });
 
+  // Gmail credentials directory
+  const homeDir = process.env.HOME || '/root';
+  const gmailDir = path.join(homeDir, '.gmail-mcp');
+  if (fs.existsSync(gmailDir)) {
+    mounts.push({
+      hostPath: gmailDir,
+      containerPath: '/home/node/.gmail-mcp',
+      readonly: false,  // MCP may need to refresh tokens
+    });
+  }
+
+  // GitHub CLI config directory
+  const ghDir = path.join(homeDir, '.config', 'gh');
+  if (fs.existsSync(ghDir)) {
+    mounts.push({
+      hostPath: ghDir,
+      containerPath: '/home/node/.config/gh',
+      readonly: true,
+    });
+  }
+
+  // MCP remote auth cache (Linear, etc.)
+  const mcpAuthDir = path.join(homeDir, '.mcp-auth');
+  if (fs.existsSync(mcpAuthDir)) {
+    mounts.push({
+      hostPath: mcpAuthDir,
+      containerPath: '/home/node/.mcp-auth',
+      readonly: false,  // mcp-remote may need to refresh tokens
+    });
+  }
+
+  // Google Calendar tokens directory
+  const calendarDir = path.join(homeDir, '.config', 'google-calendar-mcp');
+  if (fs.existsSync(calendarDir)) {
+    mounts.push({
+      hostPath: calendarDir,
+      containerPath: '/home/node/.config/google-calendar-mcp',
+      readonly: false,  // MCP may need to refresh tokens
+    });
+  }
+
   // Per-group IPC namespace: each group gets its own IPC directory
   // This prevents cross-group privilege escalation via IPC
   const groupIpcDir = resolveGroupIpcPath(group.folder);
@@ -183,7 +224,7 @@ function buildVolumeMounts(
  * Secrets are never written to disk or mounted as files.
  */
 function readSecrets(): Record<string, string> {
-  return readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY']);
+  return readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY', 'GH_TOKEN']);
 }
 
 function buildContainerArgs(mounts: VolumeMount[], containerName: string): string[] {
