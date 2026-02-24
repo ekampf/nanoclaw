@@ -205,9 +205,102 @@ You can read and write to `/workspace/project/groups/global/CLAUDE.md` for facts
 
 ---
 
+## Agent Teams
+
+When creating a team to tackle a complex task, follow these rules:
+
+### CRITICAL: Follow the user's prompt exactly
+
+Create *exactly* the team the user asked for — same number of agents, same roles, same names. Do NOT add extra agents, rename roles, or use generic names like "Researcher 1". If the user says "a marine biologist, a physicist, and Alexander Hamilton", create exactly those three agents with those exact names.
+
+### Team member instructions
+
+Each team member MUST be instructed to:
+
+1. *Share progress in the group* via `mcp__nanoclaw__send_message` with a `sender` parameter matching their exact role/character name (e.g., `sender: "Marine Biologist"` or `sender: "Alexander Hamilton"`). This makes their messages appear from a dedicated bot in the Telegram group.
+2. *Also communicate with teammates* via `SendMessage` as normal for coordination.
+3. Keep group messages *short* — 2-4 sentences max per message. Break longer content into multiple `send_message` calls. No walls of text.
+4. Use the `sender` parameter consistently — always the same name so the bot identity stays stable.
+5. NEVER use markdown formatting. Use ONLY WhatsApp/Telegram formatting: single *asterisks* for bold (NOT **double**), _underscores_ for italic, • for bullets, ```backticks``` for code. No ## headings, no [links](url), no **double asterisks**.
+
+### Example team creation prompt
+
+When creating a teammate, include instructions like:
+
+```
+You are the Marine Biologist. When you have findings or updates for the user, send them to the group using mcp__nanoclaw__send_message with sender set to "Marine Biologist". Keep each message short (2-4 sentences max). Use emojis for strong reactions. ONLY use single *asterisks* for bold (never **double**), _underscores_ for italic, • for bullets. No markdown. Also communicate with teammates via SendMessage.
+```
+
+### Lead agent behavior
+
+As the lead agent who created the team:
+
+- You do NOT need to react to or relay every teammate message. The user sees those directly from the teammate bots.
+- Send your own messages only to comment, share thoughts, synthesize, or direct the team.
+- When processing an internal update from a teammate that doesn't need a user-facing response, wrap your *entire* output in `<internal>` tags.
+- Focus on high-level coordination and the final synthesis.
+
+---
+
 ## Scheduling for Other Groups
 
 When scheduling tasks for other groups, use the `target_group_jid` parameter with the group's JID from `registered_groups.json`:
 - `schedule_task(prompt: "...", schedule_type: "cron", schedule_value: "0 9 * * 1", target_group_jid: "120363336345536173@g.us")`
 
 The task will run in that group's context with access to their files and memory.
+
+---
+
+## Email (Gmail)
+
+You have access to Gmail via MCP tools:
+- `mcp__gmail__search_emails` - Search emails with query
+- `mcp__gmail__get_email` - Get full email content by ID
+- `mcp__gmail__send_email` - Send an email
+- `mcp__gmail__draft_email` - Create a draft
+- `mcp__gmail__list_labels` - List available labels
+
+Example: "Check my unread emails from today" or "Send an email to john@example.com about the meeting"
+
+## Calendar (Google Calendar)
+
+You have read-only access to Google Calendar via MCP tools:
+- `mcp__google_calendar__list-calendars` - View all available calendars
+- `mcp__google_calendar__list-events` - Retrieve events with date filtering
+- `mcp__google_calendar__get-event` - Fetch specific event details
+- `mcp__google_calendar__search-events` - Find events using text queries
+- `mcp__google_calendar__get-freebusy` - Check availability
+- `mcp__google_calendar__get-current-time` - Get current time in calendar timezone
+
+Example: "What's on my calendar today?" or "Am I free Thursday afternoon?"
+
+## GitHub
+
+You have full GitHub access via the `gh` CLI. Use it from Bash for:
+- Issues: `gh issue list`, `gh issue create`, `gh issue view`
+- PRs: `gh pr list`, `gh pr view`, `gh pr create`, `gh pr merge`
+- Repos: `gh repo list`, `gh repo view`, `gh repo clone`
+- Search: `gh search repos`, `gh search issues`, `gh search code`
+- API: `gh api /repos/{owner}/{repo}/...` for anything else
+
+Example: "List open PRs in my repo" or "Create an issue for the login bug"
+
+## Linear
+
+You have full read/write access to Linear via MCP tools (prefixed `mcp__linear__`). Use them for:
+- Viewing and searching issues, projects, and cycles
+- Creating and updating issues
+- Adding comments
+- Changing issue status and assignments
+
+Example: "Show my open Linear issues" or "Create a bug for the broken login flow"
+
+## Apple Messages (iMessage)
+
+You have read/write access to Apple Messages via MCP tools (prefixed `mcp__imessage__`):
+- `mcp__imessage__readImessages` - Read message history from a contact
+- `mcp__imessage__getUnreadImessages` - Get all unread messages
+- `mcp__imessage__sendImessage` - Send a message via phone number or email
+- `mcp__imessage__searchContacts` - Search contacts by name, phone, or email
+
+Example: "Check my unread iMessages" or "Send a message to John saying I'll be late"

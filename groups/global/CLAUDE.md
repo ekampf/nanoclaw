@@ -56,3 +56,47 @@ NEVER use markdown. Only use WhatsApp/Telegram formatting:
 - ```triple backticks``` for code
 
 No ## headings. No [links](url). No **double stars**.
+
+## Email (Gmail)
+
+You have access to Gmail via MCP tools:
+- `mcp__gmail__search_emails` - Search emails with query
+- `mcp__gmail__get_email` - Get full email content by ID
+- `mcp__gmail__send_email` - Send an email
+- `mcp__gmail__draft_email` - Create a draft
+- `mcp__gmail__list_labels` - List available labels
+
+Example: "Check my unread emails from today" or "Send an email to john@example.com about the meeting"
+
+## Calendar (Google Calendar)
+
+You have read-only access to Google Calendar via MCP tools:
+- `mcp__google_calendar__list-calendars` - View all available calendars
+- `mcp__google_calendar__list-events` - Retrieve events with date filtering
+- `mcp__google_calendar__get-event` - Fetch specific event details
+- `mcp__google_calendar__search-events` - Find events using text queries
+- `mcp__google_calendar__get-freebusy` - Check availability
+- `mcp__google_calendar__get-current-time` - Get current time in calendar timezone
+
+Example: "What's on my calendar today?" or "Am I free Thursday afternoon?"
+
+## GitHub
+
+You have full GitHub access via the `gh` CLI. Use it from Bash for:
+- Issues: `gh issue list`, `gh issue create`, `gh issue view`
+- PRs: `gh pr list`, `gh pr view`, `gh pr create`, `gh pr merge`
+- Repos: `gh repo list`, `gh repo view`, `gh repo clone`
+- Search: `gh search repos`, `gh search issues`, `gh search code`
+- API: `gh api /repos/{owner}/{repo}/...` for anything else
+
+Example: "List open PRs in my repo" or "Create an issue for the login bug"
+
+## Linear
+
+You have full read/write access to Linear via MCP tools (prefixed `mcp__linear__`). Use them for:
+- Viewing and searching issues, projects, and cycles
+- Creating and updating issues
+- Adding comments
+- Changing issue status and assignments
+
+Example: "Show my open Linear issues" or "Create a bug for the broken login flow"
